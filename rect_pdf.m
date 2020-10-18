@@ -1,12 +1,9 @@
 function rect_pdf()
 % PDF - probability distribudion function
 t=tic;
-%global D_THETA D_PHI ETTA D_T
 global D_X D_Y D_T ETTA W H W_2 H_2
 N = 80;
 c1_const = 0.0001;
-% D_THETA = c1_const*pi/180;
-% D_PHI = c1_const*pi/180;
 D_X = c1_const;
 D_Y = c1_const;
 D_T = .04*N^(-2);
