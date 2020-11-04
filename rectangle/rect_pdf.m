@@ -1,8 +1,8 @@
 function rect_pdf()
 % PDF - probability distribudion function
 t=tic;
-global D_X D_Y D_T ETTA W H W_2 H_2
-N = 100;
+global D_X D_Y ETTA W H W_2 H_2
+N = 400;
 c1_const = 0.000001;
 D_X = c1_const; %perturbation incriment
 D_Y = c1_const;
@@ -18,8 +18,7 @@ vx = zeros(1,N); vy = zeros(1,N);
 handler = CreateRectangle(W, H);
 handler = VisualizePoints(x, y, handler);
 
-% "Position" structure. Store an information about coordinates, velocities, sumPsi and maxVelocity
-position = {x: x, y: y, vx: vx, vy: vy, sumPsi: 1e100, maxVelocity: 0.0};
+position = struct('x', x, 'y', y, 'vx', vx, 'vy', vy, 'sumPsi', 1e100, 'maxVelocity', 0.0, 'D_T', 0.001*N^(-2));
 % Vector of positions.  
 positions = [position];
 
@@ -28,18 +27,23 @@ for iter = 1:10000
     % Find vx, vy, sumPsi, maxVelosity for each position in positions vector
     for j = 1:length(positions)
         pos = positions(j); 
-    	[pos.vx, pos.vy, pos.sumPsi, pos.maxVelocity] = FindVelocities(pos.x, pos.y);   
+    	[pos.vx, pos.vy, pos.sumPsi, pos.maxVelocity] = FindVelocities(pos.x, pos.y);
+        positions(j) = pos;
     end
 
     % Sort all positions by sumPsi
-    sort(positions.sumPsi);
+    [tmp,indices] = sort([positions.sumPsi]);
+    positions = positions(indices);
 
-    % Best
-    pos = positions(1);
-    x = pos.x;
-    y = pos.y;
-    maxVelocity = pos.maxVelocity;
-    sumPsi = pos.sumPsi;
+    % Min
+    pos_best = positions(1);
+    x = pos_best.x;
+    y = pos_best.y;
+    vx = pos_best.vx;
+    vy = pos_best.vy;
+    maxVelocity = pos_best.maxVelocity;
+    sumPsi = pos_best.sumPsi;
+  
 
     if maxVelocity < 3e-10
         break;
@@ -62,20 +66,20 @@ for iter = 1:10000
     if rem(iter,1) == 0
         SaveData(x, y);
     end
+    
+    
+        coef = [0.01 0.8 1.0 1.1 1.2];
+    for j = 1:length(coef)
 
-
-    dt_array = [0.4 0.8 1.0 1.1 1.2];
-    for j = 1:length(dt_array)
-
-        pos = positions(1);
-        dt = dt_array(j);
-        pos.x = pos.x + pos.vx*dt;
-        pos.y = pos.y + pos.vy*dt;
+        dt = coef(j) * pos_best.D_T;
+        pos.x = pos_best.x + pos_best.vx*dt;
+        pos.y = pos_best.y + pos_best.vy*dt;
+        pos.D_T = dt;
         
-        if j < length(positions)
+        if j <= length(positions)
             positions(j) = pos;
         else
-	    positions = [positions pos];
+            positions = [positions pos];
         end
     end
 end
@@ -83,29 +87,4 @@ tt = toc(t);
 disp(tt);
 SaveData(x, y);
 
-end
-
-function [vx, vy, sumPsi, maxVelocity] = FindVelocities(x, y) 
-    % Find velocities (vx, and vy), sumPsi and max velocity for each point position (x,y)
-    % input: x, y - arrays of x and y coordinates
-    % output: vx, vy - arrays of velocities in x and y directions.
-    % sumPsi - sum psi
-    % maxVelocity - max velocity as vx*vx+vy*vy
-    maxVelocity = 0;
-    sumPsi = 0;
-    for k = 1:N               
-        x_cur = x(k);
-        y_cur = y(k);
-        x_other = [x(1:k-1) x(k+1:end)];
-        y_other = [y(1:k-1) y(k+1:end)];
-        
-        [vx_cur, vy_cur, sumPsi_cur] = FindVelocity(x_cur, y_cur, x_other, y_other);
-        
-        vx(k) = vx_cur;
-        vy(k) = vy_cur;
-        
-        sumPsi = sumPsi + sumPsi_cur;        
-        v2 = vx_cur^2 + vy_cur^2;
-        maxVelocity = max([v2 maxVelocity]);
-    end
 end

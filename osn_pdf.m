@@ -2,7 +2,7 @@ function osn_pdf()
 % PDF - probability distribudion function
 t=tic;
 global SPHERE_RADIUS D_THETA D_PHI ETTA D_T
-N = 200;
+N = 20;
 c1_const = 0.0001;
 SPHERE_RADIUS = 1.0;
 D_THETA = c1_const*pi/180;

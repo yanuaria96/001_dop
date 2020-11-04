@@ -1,4 +1,3 @@
-
 function [vx, vy, sumPsi] = FindVelocity(x_cur, y_cur, x_other, y_other)
 % intput: (x_cur,y_cur) - current point
 %         x_other, y_other - are x and y arrays for other points
