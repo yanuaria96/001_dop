@@ -2,16 +2,21 @@ function osn_pdf()
 % PDF - probability distribudion function
 t=tic;
 global SPHERE_RADIUS D_THETA D_PHI ETTA D_T SHARP
+format long
 N = 100;
 c1_const = 0.0001;
 SPHERE_RADIUS = 1.0;
 D_THETA = c1_const*pi/180;
 D_PHI = c1_const*pi/180;
-D_T = .04*N^(-2);
 ETTA = 1;
 SHARP = 1;
 
+
 [particles, duplicates] = GeneratePoints(N);
+% [particles, duplicates,N] = ReadPoints();
+
+D_T = .04*N^(-2);
+
 h = GenerateSphere(SPHERE_RADIUS,0,0,0);
 h = VisualizePoints([particles duplicates],h);
 
@@ -38,7 +43,7 @@ for iter = 0:10000
         sumPsi = sumPsi + sumPsi1 + sumPsi2;        
         v2 = particles(k).velocity.theta.^2 + particles(k).velocity.phi.^2;
         maxVelocity = max([v2 maxVelocity]);
-    end
+    end  
    
     if maxVelocity < 3e-4
         D_T = .04*N^(-2)*(maxVelocity/3e-4)^(-1/2);
@@ -70,6 +75,23 @@ for iter = 0:10000
         ins = 0;
         for k = 1:2*N
             ins = ins + IsInCone(aTheta(k), aPhi(k));
+        end
+        
+        insP = 0;
+        insD = 0;
+        for k = 1:N
+           ppp = IsInCone(particles(k).theta, particles(k).phi);
+           ddd = IsInCone(duplicates(k).theta, duplicates(k).phi);
+           insP = insP + ppp;
+           insD = insD + ddd;
+           
+           if ppp ~= ddd
+               disp('no');
+           end
+        end
+        
+        if rem(ins,2) ~= 0
+            disp('sdfj;sdfj');
         end
         
         disp([...

@@ -1,4 +1,3 @@
-
 function [particles, duplicates] = GeneratePoints(N)
 for k = 1:N
     theta = pi * rand();

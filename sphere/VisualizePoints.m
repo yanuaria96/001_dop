@@ -25,4 +25,8 @@ end
 subplot(handle.subplot(1));
 handle.scatter(1) = scatter3(X,Y,Z,30,[0 0 1],'filled');
 handle.scatter(2) = scatter3(Xd,Yd,Zd,30,[1 0 0],'filled');
+
+subplot(handle.subplot(2)); % subplot for 2D circle
+handle.scatter(3) = scatter(X,Z,30, [0 0 1], 'filled');
+handle.scatter(4) = scatter(Xd,Zd,30, [1 0 0], 'filled');
 end
